@@ -9,7 +9,7 @@ class DoubleConv(tf.keras.Model):
     """
     Double convolutional block of U-net architecture
     Contains two convolutional layers followed by batch normalization
-    and RelU activation functions.
+    and LeakyReLU activation functions.
 
     __Attributes__
     in_ch: int - input channels
@@ -19,17 +19,17 @@ class DoubleConv(tf.keras.Model):
     conv: tf.keras.Sequential - sequence of convolutional layers
     """
 
-    def __init__(self, in_ch, out_ch, height, width):
+    def __init__(self, in_ch, out_ch):
         super(DoubleConv, self).__init__()
         self.conv = tf.keras.Sequential([
             tf.keras.layers.Conv2D(
-                out_ch, 3, padding="same", input_shape=(height, width, in_ch)),
+                out_ch, 3, padding="same"),
             tf.keras.layers.BatchNormalization(),
-            tf.keras.layers.ReLU(),
+            tf.keras.layers.LeakyReLU(),
             tf.keras.layers.Conv2D(
-                out_ch, 3, padding="same", input_shape=(height, width, in_ch)),
+                out_ch, 3, padding="same"),
             tf.keras.layers.BatchNormalization(),
-            tf.keras.layers.ReLU()])
+            tf.keras.layers.LeakyReLU()])
 
     def call(self, x):
         x = self.conv(x)
@@ -46,9 +46,9 @@ class InConv(tf.keras.Model):
     conv: DoubleConv - class of double convolutional block
     """
 
-    def __init__(self, in_ch, out_ch, height, width):
+    def __init__(self, in_ch, out_ch):
         super(InConv, self).__init__()
-        self.conv = DoubleConv(in_ch, out_ch, height, width)
+        self.conv = DoubleConv(in_ch, out_ch)
 
     def call(self, x):
         x = self.conv(x)
@@ -67,10 +67,10 @@ class Down(tf.keras.Model):
     encode: tf.keras.Sequential - encoder block
     """
 
-    def __init__(self, in_ch, out_ch, height, width):
+    def __init__(self, in_ch, out_ch):
         super(Down, self).__init__()
         self.encode = tf.keras.Sequential([tf.keras.layers.MaxPooling2D((2, 2)),
-                                          DoubleConv(in_ch, out_ch, height, width)])
+                                          DoubleConv(in_ch, out_ch)])
 
     def call(self, x):
         x = self.encode(x)
@@ -93,15 +93,15 @@ class Up(tf.keras.Model):
     conv: tf.keras.Sequential - double convolutional layer
     """
 
-    def __init__(self, in_ch, out_ch, height, width):
+    def __init__(self, in_ch, out_ch):
         super(Up, self).__init__()
         self.up = tf.keras.layers.Conv2DTranspose(filters=in_ch // 2, kernel_size=(2, 2), strides=(2, 2),
-                                                  input_shape=(height, width, in_ch // 2))
-        self.conv = DoubleConv(in_ch, out_ch, height, width)
+                                                )
+        self.conv = DoubleConv(in_ch, out_ch)
 
     def call(self, x1, x2):
         x1 = self.up(x1)
-        x = tf.concat([x2, x1], axis=1)
+        x = tf.keras.layers.concatenate([x2, x1])
         x = self.conv(x)
         return x
 
@@ -117,10 +117,10 @@ class OutConv(tf.keras.Model):
     conv: tf.keras.Conv2D - convolutional layer
     """
 
-    def __init__(self, in_ch, out_ch, height, width):
+    def __init__(self, in_ch, out_ch):
         super(OutConv, self).__init__()
         self.conv = tf.keras.layers.Conv2D(filters=out_ch, kernel_size=(1, 1),
-                                           activation='sigmoid', input_shape=(height, width, in_ch))
+                                           activation='sigmoid')
 
     def call(self, x):
         x = self.conv(x)
@@ -149,16 +149,16 @@ class UNet(tf.keras.Model):
 
     def __init__(self, in_channels, num_classes):
         super(UNet, self).__init__()
-        self.inc = InConv(in_channels, 64, 256, 256)
-        self.down1 = Down(64, 128, 256, 256)
-        self.down2 = Down(128, 256, 128, 128)
-        self.down3 = Down(256, 512, 64, 64)
-        self.down4 = Down(512, 512, 32, 32)
-        self.up1 = Up(1024, 256, 16, 16)
-        self.up2 = Up(512, 128, 32, 32)
-        self.up3 = Up(256, 64, 64, 64)
-        self.up4 = Up(128, 64, 128, 128)
-        self.outc = OutConv(64, num_classes, 256, 256)
+        self.inc = InConv(in_channels, 64)
+        self.down1 = Down(64, 128)
+        self.down2 = Down(128, 256)
+        self.down3 = Down(256, 512)
+        self.down4 = Down(512, 512)
+        self.up1 = Up(1024, 256)
+        self.up2 = Up(512, 128)
+        self.up3 = Up(256, 64)
+        self.up4 = Up(128, 64)
+        self.outc = OutConv(64, num_classes)
 
     def call(self, x):
         x1 = self.inc(x)

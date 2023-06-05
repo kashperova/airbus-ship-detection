@@ -24,7 +24,7 @@ class Config:
 
     seed = 42
     lr = 0.01
-    epochs = 50
+    epochs = 20
     device = tf.device('/device:GPU:0') if tf.config.list_physical_devices('GPU') else tf.device('/CPU:0')
 
 

@@ -1,7 +1,9 @@
 import pandas as pd
+import albumentations as A
+from sklearn.model_selection import train_test_split
 from augmentate import AugmentationData
 from ..config import Config
-from sklearn.model_selection import train_test_split
+from .data_generator import ShipDataGenerator
 
 
 def split_data_for_training(non_zeros_ships: list, zero_ships_data: list, image_masks: pd.DataFrame):
@@ -51,5 +53,23 @@ def split_data_for_training(non_zeros_ships: list, zero_ships_data: list, image_
 
 
 def generate_datasets(non_zeros_ships: list, zero_ships_data: list, image_masks: pd.DataFrame):
+    """
+    Wrapper for split_data_for_training
+
+    :param non_zeros_ships: list of images ids with detected ships
+    :param zero_ships_data: list of images ids with no detected ships
+    :param image_masks: pd.DataFrame with all data
+    :return: train_data, valid_data, test_data : ShipDataGenerator - data generator of sample(image, mask)
+    """
     train_df, valid_df, test_df = split_data_for_training(non_zeros_ships, zero_ships_data, image_masks)
+
+    train_transforms = A.Compose([A.Resize(height=Config.input_dim, width=Config.input_dim, p=1),
+                                  A.HorizontalFlip(p=0.5),
+                                  A.augmentations.geometric.transforms.Affine(scale=1.2, always_apply=True)])
+    eval_transforms = None
+
+    train_data = ShipDataGenerator(path_df=train_df, transform=train_transforms)
+    valid_data = ShipDataGenerator(path_df=valid_df, transform=eval_transforms)
+    test_data = ShipDataGenerator(path_df=test_df, transform=eval_transforms)
+    return train_data, valid_data, test_data
 

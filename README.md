@@ -79,7 +79,7 @@ learning rate, batch size, numbers of epochs, device, etc.
 Exploratory data analysis is saved in <a href="">this notebook</a>.
 Below are the main insights from the analysis:
 
-How mant ships detected on images             |  Distribution of areas occupied by ships in images 
+How many ships detected on images             |  Distribution of areas occupied by ships in images 
 :-------------------------:|:-------------------------:
 ![eda_1.png](screenshots%2Feda_1.png)  |    ![eda_2.png](screenshots%2Feda_2.png)
 
