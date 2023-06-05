@@ -4,8 +4,12 @@ import numpy as np
 
 
 class Config:
-    # directory with train data saved in my google drive (unavailable for you)
-    data_dir = '/content/gdrive/MyDrive/AirBusDataset/train_v2/'
+    # directory with train data saved in your device locally
+    data_dir = '/path/to/train_data/'
+    mask_dir = '/path/to/masks'
+    augmented_dir = '/path/to/augmented_images'
+    aug_masks_dir = '/path/to/new_masks'
+
     validation_fraction = 0.15
     test_fraction = 0.10
     train_batch = 16
@@ -20,7 +24,7 @@ class Config:
     seed = 42
     lr = 0.01
     epochs = 50
-    device = tf.device('/device:GPU:0') if tf.test.is_gpu_available() else tf.device('/CPU:0')
+    device = tf.device('/device:GPU:0') if tf.config.list_physical_devices('GPU') else tf.device('/CPU:0')
 
 
 def set_seed(seed):
