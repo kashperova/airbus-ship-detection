@@ -41,3 +41,6 @@ class ShipDataGenerator(tf.keras.utils.Sequence):
         image = ndimage.sobel(image)
         mask = cv2.imread(mask_path, cv2.IMREAD_GRAYSCALE)
         return image, mask
+
+
+

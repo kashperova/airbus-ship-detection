@@ -4,17 +4,15 @@ Creating new images and masks from existing ones
 will help to prevent imbalancing of dataset.
 """
 
-import os
-import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
-from keras.preprocessing.image import ImageDataGenerator
 from PIL import Image
+import tensorflow as tf
 from ..config import set_seed, Config
 from .rle_mask import rle2mask
 
 
-class DataAugmentation:
+class AugmentationData:
     """
     Class for data augmentation. Some methods of transformation
     will applied to exsiting images with detected ships. After that new samples
@@ -65,69 +63,41 @@ class DataAugmentation:
             mask = Image.fromarray(all_masks)
             mask = mask.convert('L')
             mask.save(Config.mask_dir + "/" + img_id[:-4] + ".png")
-
     def augmentate(self) -> list:
         # create empty list for new images_id
-        images_ids = []
+        new_images_ids = []
+        for image_id in self.non_zero_ships:
+            mask_id = image_id[:-4] + ".png"
 
-        # define image data generator for training data
-        data_generator = ImageDataGenerator(
-            rescale=1. / 255,  # rescale pixel values to [0,1]
-            rotation_range=15,  # rotate images randomly up to 15 degrees
-            width_shift_range=0.2,  # shift images horizontally up to 20% of the width
-            height_shift_range=0.2,  # shift images vertically up to 20% of the height
-            shear_range=0.1,  # apply shear transformation up to 10%
-            zoom_range=0.1,  # zoom in/out up to 10%
-            horizontal_flip=True,  # flip images horizontally
-            fill_mode='nearest'  # fill any gaps caused by the above transformations with the nearest pixel value
-        )
+            # Load image, mask from file
+            image = tf.io.read_file(self.train_dir + image_id)
+            mask = tf.io.read_file(self.mask_dir + mask_id)
 
-        # define batch size
-        batch_size = 32
+            # Decode JPEG image to tensor
+            image = tf.image.decode_jpeg(image, channels=3)
+            mask = tf.image.decode_png(mask, channels=1)
 
-        # generate training data batches
-        train_generator = data_generator.flow_from_directory(
-            self.train_dir,  # directory containing the training data
-            target_size=(256, 256),  # resize images to 256x256 pixels
-            batch_size=batch_size,  # number of images in each batch
-            class_mode='binary',  # binary classification problem (ship vs. no ship)
-            shuffle=True  # shuffle the data before each epoch
-        )
+            # Resize image
+            image = tf.image.resize(image, [768, 768])
+            mask = tf.image.resize(mask, [768, 768])
 
-        # generate mask data batches
-        mask_generator = data_generator.flow_from_directory(
-            self.mask_dir,  # directory containing the mask data
-            target_size=(256, 256),  # resize masks to 256x256 pixels
-            batch_size=batch_size,  # number of masks in each batch
-            class_mode='binary',  # binary classification problem (ship vs. no ship)
-            shuffle=True  # shuffle the data before each epoch
-        )
+            # Flip image, mask horizontally
+            image = tf.image.flip_left_right(image)
+            mask = tf.image.flip_left_right(mask)
 
-        # create output directory if it doesn't exist
-        if not os.path.exists(self.output_dir):
-            os.makedirs(self.output_dir)
+            # Flip image, mask vertically
+            image = tf.image.flip_up_down(image)
+            mask = tf.image.flip_up_down(mask)
 
-        # create output directory for new masks if it doesn't exist
-        if not os.path.exists(self.new_mask_dir):
-            os.makedirs(self.new_mask_dir)
+            # Rotate image by 90 degrees clockwise
+            image = tf.image.rot90(image, k=1)
+            mask = tf.image.rot90(mask, k=1)
 
-        # generate new images and masks and save them to the output directory
-        for i in range(1000):  # generate 1000 new images
-            batch = next(train_generator)
-            images = batch[0]
-            filenames = batch[1]
-            mask_batch = next(mask_generator)
-            masks = mask_batch[0]
-            for j in range(batch_size):
-                image = images[j]
-                mask = masks[j]
-                filename = filenames[j]
-                new_filename = filename.split('.')[0] + '_' + str(i) + '.jpg'  # add suffix to filename for each new image
-                new_filepath = os.path.join(self.output_dir, new_filename)
-                new_mask_filename = filename.split('.')[0] + '_' + str(i) + '.png'  # add suffix to filename for each new mask
-                new_mask_filepath = os.path.join(self.new_mask_dir, new_mask_filename)
-                plt.imsave(new_filepath, image)
-                plt.imsave(new_mask_filepath, mask, cmap='gray')
-                images_ids.append(filename.split('.')[0] + '_' + str(i) + '.jpg')
+            # Convert tensor back to JPEG image and save to file
+            image = tf.cast(image, tf.uint8)
+            image = tf.image.encode_jpeg(image)
+            tf.io.write_file(self.output_dir + image_id[:-4] + '_aug.jpg', image)
 
-        return images_ids
+            mask = tf.image.encode_png(mask)
+            tf.io.write_file(self.new_mask_dir + image_id[:-4] + '_aug.png', mask)
+            new_images_ids.append(image_id[:-4] + '_aug.jpg')

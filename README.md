@@ -49,6 +49,8 @@ learning rate, batch size, numbers of epochs, device, etc.
 
 ## How to run
 
+If you want to run ```train.py``` 
+
 ## Other ways for solving / improving accuracy
 
 When I started doing exploratory data analysis, I realized that ships in segmentation masks 
