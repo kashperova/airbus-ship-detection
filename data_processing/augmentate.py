@@ -101,3 +101,4 @@ class AugmentationData:
             mask = tf.image.encode_png(mask)
             tf.io.write_file(self.new_mask_dir + image_id[:-4] + '_aug.png', mask)
             new_images_ids.append(image_id[:-4] + '_aug.jpg')
+        return new_images_ids

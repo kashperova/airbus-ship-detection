@@ -28,9 +28,10 @@ class ShipDataGenerator(tf.keras.utils.Sequence):
 
     def __getitem__(self, index):
         """
-        Loading image and mask and applying transofrmations
+        Loading image and mask and applying transformations
         and Sobel edge detection filter for image
         """
+
         img_id = self.path_df.iloc[index]['ImageId']
         img_path = os.path.join(Config.data_dir, img_id)
         mask_id = self.path_df.iloc[index]['MaskId']

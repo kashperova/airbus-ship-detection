@@ -21,7 +21,7 @@ class DoubleConv(tf.keras.Model):
 
     def __init__(self, in_ch, out_ch, height, width):
         super(DoubleConv, self).__init__()
-        self.conv = tf.keras.Sequential(
+        self.conv = tf.keras.Sequential([
             tf.keras.layers.Conv2D(
                 out_ch, 3, padding="same", input_shape=(height, width, in_ch)),
             tf.keras.layers.BatchNormalization(),
@@ -29,7 +29,7 @@ class DoubleConv(tf.keras.Model):
             tf.keras.layers.Conv2D(
                 out_ch, 3, padding="same", input_shape=(height, width, in_ch)),
             tf.keras.layers.BatchNormalization(),
-            tf.keras.layers.ReLU())
+            tf.keras.layers.ReLU()])
 
     def call(self, x):
         x = self.conv(x)
@@ -69,8 +69,8 @@ class Down(tf.keras.Model):
 
     def __init__(self, in_ch, out_ch, height, width):
         super(Down, self).__init__()
-        self.encode = tf.keras.Sequential(tf.keras.layers.MaxPooling2D((2, 2)),
-                                          DoubleConv(in_ch, out_ch, height, width))
+        self.encode = tf.keras.Sequential([tf.keras.layers.MaxPooling2D((2, 2)),
+                                          DoubleConv(in_ch, out_ch, height, width)])
 
     def call(self, x):
         x = self.encode(x)
@@ -173,4 +173,3 @@ class UNet(tf.keras.Model):
         x = self.up4(x, x1)
         x = self.outc(x)
         return x
-
