@@ -9,7 +9,9 @@ class Config:
     mask_dir = '/path/to/masks'
     augmented_dir = '/path/to/augmented_images'
     aug_masks_dir = '/path/to/new_masks'
+    test_dir = 'path/to/test_dir'
     logdir = '/path/to/logdir'
+    images_csv = '/path/to/train/csv'
 
     validation_fraction = 0.15
     test_fraction = 0.10

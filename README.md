@@ -16,31 +16,32 @@ Test task based on data from Kaggle competition Airbus Ship Detection for applyi
 Here is structure of solution.
 ```
    solution
-    ├── Dockerfile             - prepare environment 
-    ├── model.pt               - model saved in .pt format (PyTorch)
-    │
+    ├── model                  - this folder model files 
+    │  ├── model.py            - script of implementation U-net architecture
+    │  └── model.h5            - saved checkpoint of model (used in inference.py)
+    │      
     ├── notebooks              - this folder contains notebooks (.ipynb files) 
-    │  ├── EDA              - dir with images
-    │  └── labels.csv          - target values    
+    │  ├── eda.ipynb           - notebook with eda[EDA_AirbusShipDetection_(1).ipynb](..%2F..%2F..%2F%D0%97%D0%B0%D0%B2%D0%B0%D0%BD%D1%82%D0%B0%D0%B6%D0%B5%D0%BD%D0%BD%D1%8F%2FEDA_AirbusShipDetection_%281%29.ipynb)
+    │  └── evaluate.ipynb      - notebook with train and model evaluation    
     │    
-    ├── prepare_data           - this folder consits script for data preprocessing 
-    │  ├── dataset.py          - [implmentation of HandWrittenCharsDataset class] retrieve image with label
-    │  └── load_data.py        - [implmentation of DataLoading class] load data and split it to train, valid and test   
+    ├── data_processing        - this folder consits scripts for data preprocessing 
+    │  ├── augmentate.py        - script for data augmentation
+    │  ├── rle_mask.py          - script for converting run-length encode format to binary mask 
+    │  ├── data_split.py        - script for splitting data on train, valid and test datasets       
+    │  └── data_generator.py    - script for generating sample (image, mask) during training   
     │
-    ├── config.py              - script for testing on your own images
-    ├── model_cnn.py           - [implmentation of CNN class] model for image classification in PyTorch    
-    ├── train.py               - [implmentation of TrainAndEvaluateModel class] train and save model
-    ├── eval_plots.py          - implmentation of methods for metrics visualization
-    ├── inference.py           - script for testing on your own images
-    ├── Documentation.md       - current file that descibes used data, methods, ideas and reports accuracy.
-    ├── /reports               - directory with metrics plots.
+    ├── config.py              - script for saving configuration setting and constants
+    ├── train.py               - script for training and saving model
+    ├── inference.py           - script for running model on test images
+    ├── README.md              - current file that descibes used data, methods and ideas.
+    ├── /screenshots           - directory with visualization, screenshots and metrics plots.   
     └── requirements.txt       - list of libraries for the project
 ```
 
 ## Configuration and data loading
 Before you start to explore solution and run scripts, you should to define some necessary parameters
 in ```Config``` class which point to directories with training images and masks, 
-as well as directories for augmented data (located in ```config.py```).
+as well as directories for augmented and testing data (located in ```config.py```).
 
 In <a href = "">EDA notebook</a> I propose 2 ways for downloading data using Kaggle API. Firstly, you should upload
 your kaggle.json with API key and run such command:
@@ -69,6 +70,9 @@ and after that running previous 4 commands changing file paths to your google dr
 ├── mask_dir : path to training masks (converted from rle format and saved to this directory)
 ├── augmented_dir : path to augmented images (transformed images with detected ships to prevent imbalancing of intiail dataset)
 ├── aug_masks_dir : path to augmented masks (transformed masks from initial dataset)
+├── test_dir : path to images for testing
+├── logdir : path to directory for saving logs during training
+├── images_csv : path to file with images masks (train_ship_segmentations_v2.csv)
 ```
 
 At this class you can also change important parameters for model training such as
@@ -94,9 +98,24 @@ How many ships detected on images             |  Distribution of areas occupied 
 
 ## Data augmentation
 As mention before, initial dataset is so imbalanced. That's why I decided to use some transformations
-to augmentate data. To be honest, this process spent the biggest time 
+to augmentate data. To be honest, this process took me the most time, and now, when I write this documentation on the last day of the deadline, 
+I understand that I should have spent more time on tuning the model, rather than preprocessing the data. 
+
+During augmentation I used ```HorizontalFlip```, ```VerticalFlip```, ```Resize```, ```Rotation``` and ```Affine Tranformation```.
+
+After the augmentation, the number of samples with detected ships doubled.
+Next, I removed every fifth sample without ships, thus the ratio in the dataset became 2:3.
+
+Additionaly, after first version of model, in ```data_generator.py``` I used ```Sobel filter``` 
+because I read that its use improves the performance of convolutional networks 
+and performs well in small object segmentation tasks  [2] . 
 
 ## Building a model
+
+As mention in test task description, prefered model for solving this task is U-net. 
+My implementation of model is saved in ```models/model.py```. 
+
+I used architecture from original paper [3]. 
 
 ## Training and evaluation
 
@@ -105,6 +124,22 @@ to augmentate data. To be honest, this process spent the biggest time
 ### Train
 If you want to run ```train.py```, you should define working directories in ```config.py``` (with downloaded data).
 After that you need to install virtual environment with necessary libs using ```requirements.txt```. 
+
+#### Requirements
+1. Check your python version: 
+
+    ```python3 --version```
+
+2. Install virtual environment in solution directory: 
+
+    ```python3 -m venv venv```<br>
+```source venv/bin/activate```
+4. Install all necessary libraries to your virtual environment using such command as: </br>
+```pip install -r requirements.txt```
+
+If you defined all parameters in ```config.py```, you don't need to specify anything to run train
+script. 
+If you 
 
 ### Inference
 
@@ -116,8 +151,6 @@ are more like bounding boxes and, accordingly, this competition can be considere
 After reading several papers, I came to the conclusion that in this case
 (satellite images with only 3 channels, rather small objects on training data), 
 the architecture SWIN Transformer with YOLOv5 should work well [5]. 
-
-Some experiments with model based on this architecture <i>will be</i> saved in <a href="https://github.com/kashperova/swin-yolov5-airbus-ship-detection">this repository</a>.
 
 I did not have time to implement this solution, as I spent a lot of time building a pipeline for data augmentation. At the beginning, I decided to use 
 albumentations and opencv libraries,

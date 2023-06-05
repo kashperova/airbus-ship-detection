@@ -63,6 +63,7 @@ class AugmentationData:
             mask = Image.fromarray(all_masks)
             mask = mask.convert('L')
             mask.save(Config.mask_dir + "/" + img_id[:-4] + ".png")
+
     def augmentate(self) -> list:
         # create empty list for new images_id
         new_images_ids = []
