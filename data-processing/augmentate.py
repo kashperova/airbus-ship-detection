@@ -8,10 +8,10 @@ import os
 import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
-from tensorflow.keras.preprocessing.image import ImageDataGenerator
+from keras.preprocessing.image import ImageDataGenerator
 from PIL import Image
 from ..config import set_seed, Config
-from .rle_mask import rle2mask, mask2rle
+from .rle_mask import rle2mask
 
 
 class DataAugmentation:
@@ -38,7 +38,8 @@ class DataAugmentation:
           private method for saving initial masks in defined directory
 
         augmentate():
-          public method for creating new images
+          public method for creating new images and masks
+          returns list of new images/masks id
     """
 
     def __init__(self, non_zero_ships: list, image_masks: pd.DataFrame):
@@ -62,9 +63,13 @@ class DataAugmentation:
             for mask in img_masks:
                 all_masks += rle2mask(mask)
             mask = Image.fromarray(all_masks)
-            mask.save(Config.mask_dir + "/" + img_id[:-4] + "_mask.png")
+            mask = mask.convert('L')
+            mask.save(Config.mask_dir + "/" + img_id[:-4] + ".png")
 
-    def augmentate(self):
+    def augmentate(self) -> list:
+        # create empty list for new images_id
+        images_ids = []
+
         # define image data generator for training data
         data_generator = ImageDataGenerator(
             rescale=1. / 255,  # rescale pixel values to [0,1]
@@ -123,3 +128,6 @@ class DataAugmentation:
                 new_mask_filepath = os.path.join(self.new_mask_dir, new_mask_filename)
                 plt.imsave(new_filepath, image)
                 plt.imsave(new_mask_filepath, mask, cmap='gray')
+                images_ids.append(filename.split('.')[0] + '_' + str(i) + '.jpg')
+
+        return images_ids
