@@ -22,7 +22,7 @@ def inference(args):
     test_images = []
     files = os.listdir(args.test_dir)
     for img in files:
-        test_images.appen(img)
+        test_images.append(img)
 
     r, c = 1, 2
     for i in range(len(test_images)):
