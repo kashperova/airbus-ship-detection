@@ -122,7 +122,9 @@ I used architecture from original paper [3].
 As I said earlier, I did not correctly allocate time during the execution of the test task, 
 so I had little time to train the model, so I used a small number of epochs (10-15).
 
-
+During training I sued dice coefficient (```DiceLoss``` in ```train.py```) for loss 
+and combination of binary cross-entropy (```DiceBCELoss``` in ```train.py```) as metric on validation
+dataset.
 
 
 ## How to run
