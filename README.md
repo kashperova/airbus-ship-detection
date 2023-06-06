@@ -123,9 +123,14 @@ As I said earlier, I did not correctly allocate time during the execution of the
 so I had little time to train the model, so I used a small number of epochs (10-15).
 
 During training I sued dice coefficient (```DiceLoss``` in ```train.py```) for loss 
-and combination of binary cross-entropy (```DiceBCELoss``` in ```train.py```) as metric on validation
+and combination of binary cross-entropy with dice coef (```DiceBCELoss``` in ```train.py```) as metric on validation
 dataset.
 
+Screenshot of training
+
+Screenshot of evaluation
+
+Tensorboard
 
 ## How to run
 
