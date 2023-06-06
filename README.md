@@ -122,7 +122,7 @@ I used architecture from original paper [3].
 As I said earlier, I did not correctly allocate time during the execution of the test task, 
 so I had little time to train the model, so I used a small number of epochs (10-15).
 
-During training I sued dice coefficient (```DiceLoss``` in ```train.py```) for loss 
+During training, I used dice coefficient (```DiceLoss``` in ```train.py```) for loss 
 and combination of binary cross-entropy with dice coef (```DiceBCELoss``` in ```train.py```) as metric on validation
 dataset.
 
@@ -171,7 +171,7 @@ in the configuration class, or through the command line.
 
 ```python inference.py --model_dir path_to_checkpoint --test_dir path_to_test_images```
 
-
+![inference.png](screenshots%2Finference.png)
 
 ## Other ways for solving / improving accuracy
 
