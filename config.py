@@ -12,6 +12,7 @@ class Config:
     test_dir = 'path/to/test_dir'
     logdir = '/path/to/logdir'
     images_csv = '/path/to/train/csv'
+    model_dir = 'model/model.h5'
 
     validation_fraction = 0.15
     test_fraction = 0.10

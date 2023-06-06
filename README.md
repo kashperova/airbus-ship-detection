@@ -21,7 +21,7 @@ Here is structure of solution.
     │  └── model.h5            - saved checkpoint of model (used in inference.py)
     │      
     ├── notebooks              - this folder contains notebooks (.ipynb files) 
-    │  ├── eda.ipynb           - notebook with eda[EDA_AirbusShipDetection_(1).ipynb](..%2F..%2F..%2F%D0%97%D0%B0%D0%B2%D0%B0%D0%BD%D1%82%D0%B0%D0%B6%D0%B5%D0%BD%D0%BD%D1%8F%2FEDA_AirbusShipDetection_%281%29.ipynb)
+    │  ├── eda.ipynb           - notebook with eda[EDA_AirbusShipDetection_(1).ipynb]
     │  └── evaluate.ipynb      - notebook with train and model evaluation    
     │    
     ├── data_processing        - this folder consits scripts for data preprocessing 
@@ -43,7 +43,7 @@ Before you start to explore solution and run scripts, you should to define some 
 in ```Config``` class which point to directories with training images and masks, 
 as well as directories for augmented and testing data (located in ```config.py```).
 
-In <a href = "">EDA notebook</a> I propose 2 ways for downloading data using Kaggle API. Firstly, you should upload
+In <a href = "notebooks/eda.ipynb">EDA notebook</a> I propose 2 ways for downloading data using Kaggle API. Firstly, you should upload
 your kaggle.json with API key and run such command:
 
 ```!kaggle competitions download -c airbus-ship-detection```
@@ -80,7 +80,7 @@ learning rate, batch size, numbers of epochs, device, etc.
 
 ## EDA
 
-Exploratory data analysis is saved in <a href="">this notebook</a>.
+Exploratory data analysis is saved in <a href="notebooks/eda.ipynb">this notebook</a>.
 Below are the main insights from the analysis:
 
 How many ships detected on images             |  Distribution of areas occupied by ships in images 
@@ -119,6 +119,12 @@ I used architecture from original paper [3].
 
 ## Training and evaluation
 
+As I said earlier, I did not correctly allocate time during the execution of the test task, 
+so I had little time to train the model, so I used a small number of epochs (10-15).
+
+
+
+
 ## How to run
 
 ### Train
@@ -139,9 +145,21 @@ After that you need to install virtual environment with necessary libs using ```
 
 If you defined all parameters in ```config.py```, you don't need to specify anything to run train
 script. 
-If you 
+
+```python train.py```
+
+If you want to change parameters though command line:
+
+```python train.py --image_csv new_dir_to_csv --model_dir new_model_dir --epochs 30 --lr 0.001```
 
 ### Inference
+
+For testing model you should define 2 important parameters:
+- model_dir - path to model checkpoint
+- test_dir - path to test images
+
+
+
 
 
 ## Other ways for solving / improving accuracy
@@ -156,8 +174,8 @@ I did not have time to implement this solution, as I spent a lot of time buildin
 albumentations and opencv libraries,
 but there were encoding problems that I tried to solve for a long time (I usually work with PyTorch). In the end, due to the deadline, I decided to use the built-in methods
 of Tensorflow to work with images.
-But I plan to implement this model, so maybe when you read this documentation, there is something 
-worthwhile in <a href="https://github.com/kashperova/swin-yolov5-airbus-ship-detection">this repository</a>.
+But I plan to implement this model, so maybe in future there is something 
+worthwhile in <a href="">this repository</a>.
 <br></br>
 <b> As for methods of improving current model (U-net for segmentation task): </b>
 1. More data. Initial dataset was so imbalanced, approximately 70% of image have no detected ships.

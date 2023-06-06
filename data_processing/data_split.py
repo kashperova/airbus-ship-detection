@@ -66,10 +66,11 @@ def generate_datasets(non_zeros_ships: list, zero_ships_data: list, image_masks:
     train_transforms = A.Compose([A.Resize(height=Config.input_dim, width=Config.input_dim, p=1),
                                   A.HorizontalFlip(p=0.5),
                                   A.augmentations.geometric.transforms.Affine(scale=1.2, always_apply=True)])
-    eval_transforms = None
+    eval_transforms = A.Compose([A.Resize(height=Config.input_dim, width=Config.input_dim, p=1)])
 
     train_data = ShipDataGenerator(path_df=train_df, transform=train_transforms)
     valid_data = ShipDataGenerator(path_df=valid_df, transform=eval_transforms)
     test_data = ShipDataGenerator(path_df=test_df, transform=eval_transforms)
+
     return train_data, valid_data, test_data
 

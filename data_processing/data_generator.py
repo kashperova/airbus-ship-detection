@@ -52,17 +52,14 @@ class ShipDataGenerator(tf.keras.utils.Sequence):
         if self.transform is not None:
             image = self.transform(image=image)
             mask = self.transform(image=mask)
+            # apply Sobel edge detection filter
+            image = ndimage.sobel(image['image'])
+            # reshape (add one dimension)
+            mask = mask['image']
 
-        # apply Sobel edge detection filter
-        image = ndimage.sobel(image['image'])
-        # reshape (add one dimension)
-        mask = mask['image']
         mask = mask.reshape((1, Config.input_dim, Config.input_dim))
         image = image.reshape((1, Config.input_dim, Config.input_dim, 3))
 
         # normalize
         image = tf.cast(image, tf.float32) / 255.0
-        mask -= 1
         return image, mask
-
-
