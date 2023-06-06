@@ -126,11 +126,10 @@ During training I sued dice coefficient (```DiceLoss``` in ```train.py```) for l
 and combination of binary cross-entropy with dice coef (```DiceBCELoss``` in ```train.py```) as metric on validation
 dataset.
 
-Screenshot of training
+DiceBCELoss             |  DiceLoss  
+:-------------------------:|:-------------------------:
+![dicebceloss.png](screenshots%2Fdicebceloss.png)  |    ![diceloss.png](screenshots%2Fdiceloss.png)
 
-Screenshot of evaluation
-
-Tensorboard
 
 ## How to run
 
@@ -157,7 +156,9 @@ script.
 
 If you want to change parameters though command line:
 
-```python train.py --image_csv new_dir_to_csv --model_dir new_model_dir --epochs 30 --lr 0.001```
+```python train.py --image_csv new_dir_to_csv --model_dir new_model_dir --epochs 10 --lr 0.001```
+
+![train.png](screenshots%2Ftrain.png)
 
 ### Inference
 

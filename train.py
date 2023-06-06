@@ -107,8 +107,8 @@ def plot_metrics(results):
     ax_loss.plot(results.epoch, results.history["loss"], label="Training losses")
     ax_loss.plot(results.epoch, results.history["val_loss"], label="Validation losses")
     ax_loss.legend()
-    ax_acc.plot(results.epoch, results.history["dice_coef"], label="Training Dice Coef")
-    ax_acc.plot(results.epoch, results.history["val_dice_coef"], label="Validation Dice Coef")
+    ax_acc.plot(results.epoch, results.history["iou_score"], label="Training IOU")
+    ax_acc.plot(results.epoch, results.history["val_iou_score"], label="Validation IOU")
     ax_acc.legend()
 
 
