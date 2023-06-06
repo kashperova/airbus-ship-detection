@@ -158,7 +158,10 @@ For testing model you should define 2 important parameters:
 - model_dir - path to model checkpoint
 - test_dir - path to test images
 
+As in the case of the training script, you can initially specify the parameters
+in the configuration class, or through the command line.
 
+```python inference.py --model_dir path_to_checkpoint --test_dir path_to_test_images```
 
 
 
