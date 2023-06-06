@@ -4,6 +4,7 @@ import os
 import tensorflow as tf
 import numpy as np
 import matplotlib.pyplot as plt
+import albumentations as A
 import cv2
 from .config import Config
 
@@ -11,7 +12,10 @@ from .config import Config
 def get_segmentation(test_dir, img, model):
     img_path = os.path.join(test_dir, img)
     img = cv2.imread(img_path)
-    img = tf.expand_dims(img, axis=0)
+    transform = A.Resize(height=Config.input_dim, width=Config.input_dim, p=1)
+    img = transform(image=img)
+    img = img['image']
+    img = img.reshape((1, Config.input_dim, Config.input_dim, 3))
     pred = model.predict(img)
     pred = np.squeeze(pred, axis=0)
     return cv2.imread(img_path), pred
