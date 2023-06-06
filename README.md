@@ -173,6 +173,13 @@ in the configuration class, or through the command line.
 
 ![inference.png](screenshots%2Finference.png)
 
+I run inference script on images that weren't located in train/validation datasets. 
+As you can see, the model doesn't work well on images that it hasn't seen. 
+I came to the conclusion that the model is still overtrained, and a good balance
+should be found between images with and without ships. And also I need to improve 
+the data augmentation pipeline, add noise so that the model does not retrain on the same landscape
+(I noticed that the color of the water affected the quality of the final segmentation of my model).
+
 ## Other ways for solving / improving accuracy
 
 When I started doing exploratory data analysis, I realized that ships in segmentation masks 
