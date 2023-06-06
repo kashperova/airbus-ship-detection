@@ -40,7 +40,7 @@ def inference(args):
 
 if __name__ == "main":
     parser = argparse.ArgumentParser()
-    parser.add_argument('--model_dir', type=str, default=Config.data_dir,  help='path to model checkpoint')
+    parser.add_argument('--model_dir', type=str, default=Config.model_dir,  help='path to model checkpoint')
     parser.add_argument('--test_dir', type=str, default=Config.test_dir, help='path to test images')
     args = parser.parse_args()
     inference(args)
