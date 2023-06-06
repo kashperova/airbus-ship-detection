@@ -13,6 +13,7 @@ class Config:
     logdir = '/path/to/logdir'
     images_csv = '/path/to/train/csv'
     model_dir = 'model/model.h5'
+    model_json = 'model/model.json'
 
     validation_fraction = 0.15
     test_fraction = 0.10

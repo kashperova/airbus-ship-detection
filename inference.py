@@ -1,11 +1,11 @@
-import keras
 import argparse
 import os
-import tensorflow as tf
+from keras.models import model_from_json
 import numpy as np
 import matplotlib.pyplot as plt
 import albumentations as A
 import cv2
+from model import UNet
 from .config import Config
 
 
@@ -16,13 +16,20 @@ def get_segmentation(test_dir, img, model):
     img = transform(image=img)
     img = img['image']
     img = img.reshape((1, Config.input_dim, Config.input_dim, 3))
+    img = img.astype('float')
     pred = model.predict(img)
     pred = np.squeeze(pred, axis=0)
     return cv2.imread(img_path), pred
 
 
 def inference(args):
-    model = keras.models.load_model(args.model_dir, compile=False)
+    json_file = open(args.model_json, 'r')
+    loaded_model_json = json_file.read()
+    json_file.close()
+    model = model_from_json(loaded_model_json, custom_objects={'UNet': UNet})
+    model.build(input_shape=(1, Config.input_dim, Config.input_dim, 3))
+    model.load_weights(args.model_dir)
+
     test_images = []
     files = os.listdir(args.test_dir)
     for img in files:
@@ -44,6 +51,7 @@ def inference(args):
 
 if __name__ == "main":
     parser = argparse.ArgumentParser()
+    parser.add_argument('--model_json', type=str, default=Config.model_json, help='path to model json')
     parser.add_argument('--model_dir', type=str, default=Config.model_dir,  help='path to model checkpoint')
     parser.add_argument('--test_dir', type=str, default=Config.test_dir, help='path to test images')
     args = parser.parse_args()

@@ -18,6 +18,7 @@ Here is structure of solution.
    solution
     ├── model                  - this folder model files 
     │  ├── model.py            - script of implementation U-net architecture
+    │  └── model.json          - saved serialized model (architecture)
     │  └── model.h5            - saved checkpoint of model (used in inference.py)
     │      
     ├── notebooks              - this folder contains notebooks (.ipynb files) 
@@ -72,6 +73,8 @@ and after that running previous 4 commands changing file paths to your google dr
 ├── aug_masks_dir : path to augmented masks (transformed masks from initial dataset)
 ├── test_dir : path to images for testing
 ├── logdir : path to directory for saving logs during training
+├── model_dir : path to directory of model's weights
+├── model_json : path to directory of serialized model architecture
 ├── images_csv : path to file with images masks (train_ship_segmentations_v2.csv)
 ```
 
@@ -169,7 +172,7 @@ For testing model you should define 2 important parameters:
 As in the case of the training script, you can initially specify the parameters
 in the configuration class, or through the command line.
 
-```python inference.py --model_dir path_to_checkpoint --test_dir path_to_test_images```
+```python inference.py --model_json path_to_model_json --model_dir path_to_checkpoint --test_dir path_to_test_images```
 
 ![inference.png](screenshots%2Finference.png)
 
